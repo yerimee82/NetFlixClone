@@ -9,6 +9,7 @@ import UIKit
 
 class HeroHeaderUIView: UIView {
     
+    // MARK: - downloadButton
     private let downloadButton: UIButton = {
         let button = UIButton()
         button.setTitle("Download", for: .normal)
@@ -19,8 +20,8 @@ class HeroHeaderUIView: UIView {
         return button
     }()
     
+    // MARK: - playButton
     private let playButton: UIButton = {
-        
         let button = UIButton()
         button.setTitle("Play", for: .normal)
         button.layer.borderColor = UIColor.white.cgColor
@@ -30,6 +31,7 @@ class HeroHeaderUIView: UIView {
         return button
     }()
 
+    //MARK: - hereImageView
     private let heroImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.contentMode = .scaleToFill
@@ -38,6 +40,8 @@ class HeroHeaderUIView: UIView {
         return imageView
     }()
     
+    //MARK: - ImageGradient
+    // 이미지 그라데이션 처리 
     private func addGradient() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
@@ -51,9 +55,14 @@ class HeroHeaderUIView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(heroImageView)
+        // 그라데이션 적용
         addGradient()
+        
+        // 적용 후, 그 위에 버튼 배치
         addSubview(playButton)
         addSubview(downloadButton)
+        
+        // 뷰 제약 추가
         applyConstraints()
     }
     
@@ -73,7 +82,9 @@ class HeroHeaderUIView: UIView {
         NSLayoutConstraint.activate(playButtonConstraints)
         NSLayoutConstraint.activate(downloadButtonConstraints)
     }
-
+    
+    // viewDidLoad() 와 달리 여러번 호출 된다 -> 뷰의 레이아웃이 변결될 때 마다 호출됨.
+    // 하위 뷰들의 레이아웃을 배치하기 전에 호출되므로, addSubview() 메소드를 호출한 후 위치하는 것이 일반적.
     override func layoutSubviews() {
         super.layoutSubviews()
         heroImageView.frame = bounds
