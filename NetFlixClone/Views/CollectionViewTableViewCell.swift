@@ -7,6 +7,10 @@
 
 import UIKit
 
+
+protocol CollectionViewTableViewCellDelegate: AnyObject {
+    func collectionViewTableViewCellDidTapCall(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel)
+}
 // UITableViewCell 내부에 UICollectionView 를 추가한 커스텀 뷰
 // UITableView의 다양한 기능을 활용하여 뷰를 구성하며, UICollectionView 의 레이아웃이나 셀 디자인 등을 독립적으로 커스텀 가능
 class CollectionViewTableViewCell: UITableViewCell {
@@ -15,6 +19,8 @@ class CollectionViewTableViewCell: UITableViewCell {
     // dequeueReuableCell 메서드를 호출할 때 사용되며, 해당 셀의 인스턴스를 가져온다.
     // 셀을 참조할 때 해당 식별자 사용
     static let identifier = "CollectionViewTableViewCell"
+    
+    weak var delegate: CollectionViewTableViewCellDelegate?
     
     private var titles: [Title] = [Title]()
     
@@ -83,5 +89,31 @@ extension CollectionViewTableViewCell: UICollectionViewDelegate, UICollectionVie
     // 섹션 내의 셀 개수를 반환함
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return titles.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
+        let title = titles[indexPath.row]
+        guard let titleName = title.original_title ?? title.original_title else {
+            return
+        }
+        
+        APICaller.shared.getMovie(with: titleName + " trailer") { [weak self] result in
+            switch result {
+            case .success(let videoElement):
+                let title = self?.titles[indexPath.row]
+                guard let titleOverview = title?.overview else {
+                    return
+                }
+                guard let strongSelf = self else {
+                    return
+                }
+                let viewModel = TitlePreviewViewModel(title: titleName, youtubeView: videoElement, titleOverview: titleOverview)
+                self?.delegate?.collectionViewTableViewCellDidTapCall(strongSelf, viewModel: viewModel)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

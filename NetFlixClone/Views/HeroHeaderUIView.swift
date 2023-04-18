@@ -83,6 +83,13 @@ class HeroHeaderUIView: UIView {
         NSLayoutConstraint.activate(downloadButtonConstraints)
     }
     
+    public func configure(with model: TitleViewModel) {
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w500/\(model.posterURL)") else {
+            return
+        }
+        
+        heroImageView.sd_setImage(with: url, completed: nil)
+    }
     // viewDidLoad() 와 달리 여러번 호출 된다 -> 뷰의 레이아웃이 변결될 때 마다 호출됨.
     // 하위 뷰들의 레이아웃을 배치하기 전에 호출되므로, addSubview() 메소드를 호출한 후 위치하는 것이 일반적.
     override func layoutSubviews() {
