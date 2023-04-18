@@ -39,6 +39,7 @@ class CollectionViewTableViewCell: UITableViewCell {
         collectionView.register(TitleCollectionViewCell.self, forCellWithReuseIdentifier: TitleCollectionViewCell.identifier)
         
         return collectionView
+        
     }()
     
     // 클래스 초기화 메서드 정의
@@ -68,7 +69,10 @@ class CollectionViewTableViewCell: UITableViewCell {
             self?.collectionView.reloadData()
         }
     }
-
+    
+    private func downloadTitleAt(indexPath: IndexPath) {
+        print("Downloading \(String(describing: titles[indexPath.row].original_title))")
+    }
 }
 
 
@@ -116,4 +120,20 @@ extension CollectionViewTableViewCell: UICollectionViewDelegate, UICollectionVie
             }
         }
     }
+    
+    
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        let config = UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil) { [weak self] _ in
+                let downloadAction = UIAction(title: "Download", subtitle: nil, image: nil, identifier: nil, discoverabilityTitle: nil, state: .off) { _ in
+                    self?.downloadTitleAt(indexPath: indexPath)
+                }
+                return UIMenu(title: "", subtitle: nil, image: nil, options: .displayInline, children: [downloadAction])
+            }
+        return config
+    }
 }
+
